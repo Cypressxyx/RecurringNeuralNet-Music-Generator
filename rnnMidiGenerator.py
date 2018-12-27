@@ -1,7 +1,7 @@
 ''' Recurring Neural Network 
-		- Music generator
-	  - LSTM cells are used to mainta temporal
-			dependencies betweeing music notes
+	- Music generator
+	- LSTM cells are used to mainta temporal
+	dependencies betweeing music notes
 '''
 import tensorflow as tf
 from tensorflow.contrib import rnn
@@ -13,7 +13,7 @@ from util.midi_manipulation import noteStateMatrixToMidi
 
 '''
 	Generate Song length
-		• song length >= minSongLen
+	* song length >= minSongLen
 '''
 def generateData(minSongLen):
 	encoded_songs = create_dataset(minSongLen)
@@ -56,9 +56,9 @@ minSongLen = 128
 dataSet = generateData(minSongLen)
 inputSize = dataSet[0].shape[1] #num of possibile MIDI notes
 outputSize = inputSize
-hiddenSize = 128 								#number of neurons
+hiddenSize = 14 								#number of neurons
 eta	= 0.001											#learning rate
-epoch = 200											#num of batches during training
+epoch = 350											#num of batches during training
 batchSize = 64									#num songs per batch
 timesteps = 64									#len of song snipet. 
 assert timesteps < minSongLen	
@@ -82,7 +82,6 @@ optimizer = tf.train.AdamOptimizer(eta)
 trainOperation = optimizer.minimize(lossOperation)
 
 #accuracy
-
 #determine the predcted next note and true next note across training batch
 
 trueNote = tf.argmax(outputVec, 1)
@@ -99,7 +98,7 @@ session = tf.InteractiveSession()
 session.run(init)
 
 #train 
-displayStep = 100 
+displayStep = 100
 for step in range(epoch):
 	#get batch
 	batchX, batchY = get_batch(dataSet, batchSize, timesteps, inputSize, outputSize)
@@ -107,19 +106,19 @@ for step in range(epoch):
 	feed_dict = { inputVec: batchX, outputVec: batchY  }
 	session.run(trainOperation, feed_dict = feed_dict)
 	
-	if step % displayStep == 0 or step == 1:
+	if step % displayStep == 0:
 		loss, acc = session.run([lossOperation, accuracyOperation], feed_dict = feed_dict)
 		suffix = "\nStep " + str(step) + ", Minibatch Loss = " + \
 							"{:4f}".format(loss) + ", Training Accuray = " + \
 							"{:3f}".format(acc) 
-		print_progress(step, epoch, barLength = 50, suffix = suffix)
+		print_progress(step, epoch, barLength = epoch, suffix = suffix)
 print("")
 
-GEN_SEED_RAND = False #use random snippet as seed for generating new song
+GEN_SEED_RAND = True #use random snippet as seed for generating new song
 
 if GEN_SEED_RAND:
 	numSongs = len(dataSet)
-	ind = np.random.randint(NUM_SONGS)
+	ind = np.random.randint(numSongs)
 else:
 	ind = 14 #blank space chorus
 
@@ -129,24 +128,15 @@ genSong = dataSet[ind][:timesteps].tolist()
 for i in range(500):
 	seed = np.array([genSong[-timesteps:]])
 	
-	#get prob for next note played using seed and rnn model
-	#predictProp = Rnn([seed, timesteps, inputSize],weights,biases)[1]
-	#predictProp = session.run(Rnn[seed,timesteps,inputSize,weights,biases)
+	#get prob for next note using seed and trained rnn prediction model
 	predictProp = session.run(prediction, feed_dict = {inputVec: seed})
 	
-	
 	playedNotes = np.zeros(outputSize)
-	#sampledNote = np.random.random_sample(predictProp)[0]
 	sampledNote = np.random.choice( range(outputSize), p = predictProp[0])
 	playedNotes[sampledNote] = 1
 	genSong.append(playedNotes)
 
 noteStateMatrixToMidi(genSong, name="generatedSong0")
 noteStateMatrixToMidi(dataSet[ind], name="baseSong0")
+noteStateMatrixToMidi(dataSet[ind], name="baseSong0")
 print("Saved generated Song! Seed index: {}".format(ind))
-	
-	
-
-
-
-
