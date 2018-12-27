@@ -1,7 +1,8 @@
-''' Recurring Neural Network 
-	- Music generator
-	- LSTM cells are used to mainta temporal
-	dependencies betweeing music notes
+'''
+ Recurring Neural Network 
+- Music generator
+- LSTM cells are used to mainta temporal
+dependencies betweeing music notes
 '''
 import tensorflow as tf
 from tensorflow.contrib import rnn
@@ -12,8 +13,8 @@ from util.midi_manipulation import noteStateMatrixToMidi
 
 
 '''
-	Generate Song length
-	* song length >= minSongLen
+Generate Song length
+* song length >= minSongLen
 '''
 def generateData(minSongLen):
 	encoded_songs = create_dataset(minSongLen)
@@ -21,11 +22,11 @@ def generateData(minSongLen):
 
 
 '''
-	Params:
-		- InputVec: input vector placeholder
-		- weights:	generated weights
-		- biases: 	generated biases
-		- return:		rnn graph
+Params:
+	- InputVec: input vector placeholder
+	- weights:	generated weights
+	- biases: 	generated biases
+	- return:		rnn graph
 '''
 def Rnn(inputVec, weights, biases):
 	#unstack timeteps into (batch , n inputs)
@@ -56,15 +57,15 @@ minSongLen = 128
 dataSet = generateData(minSongLen)
 inputSize = dataSet[0].shape[1] #num of possibile MIDI notes
 outputSize = inputSize
-hiddenSize = 14 								#number of neurons
-eta	= 0.001											#learning rate
-epoch = 350											#num of batches during training
-batchSize = 64									#num songs per batch
-timesteps = 64									#len of song snipet. 
+hiddenSize = 14	#number of neurons
+eta	= 0.001	#learning rate
+epoch = 350	#num of batches during training
+batchSize = 64	#num songs per batch
+timesteps = 64	#len of song snipet. 
 assert timesteps < minSongLen	
 	
-inputPhSize = [None, timesteps, inputSize] 				#inpput placeholder size
-outputPhSize = [None, outputSize]									#output placeholder size
+inputPhSize = [None, timesteps, inputSize]	#input placeholder size
+outputPhSize = [None, outputSize]	#output placeholder size
 inputVec = tf.placeholder(tf.float32, inputPhSize)
 outputVec = tf.placeholder(tf.float32, outputPhSize)
 
